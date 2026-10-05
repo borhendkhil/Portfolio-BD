@@ -1,0 +1,254 @@
+@import "tailwindcss";
+
+/* Class-based dark mode driven by the `dark` class on <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Design tokens.
+ * Every colour used in the UI resolves to one of these variables, so switching
+ * themes is a single class toggle on <html> and never duplicates utility markup.
+ */
+:root {
+  --canvas: #ffffff;
+  --canvas-soft: #f7f8fa;
+  --surface: #ffffff;
+  --surface-2: #f4f6f9;
+  --surface-3: #eceff4;
+  --line: #e3e7ee;
+  --line-strong: #cbd3df;
+  --fg: #0b1220;
+  --fg-muted: #4d5866;
+  --fg-subtle: #6f7a89;
+  --accent: #0b6bcb;
+  --accent-hover: #095ab0;
+  --accent-fg: #ffffff;
+  --accent-soft: #e7f0fb;
+  --accent-line: #bcd6f2;
+  --grid: rgb(11 18 32 / 0.045);
+  --glow: rgb(11 107 203 / 0.09);
+  --shadow-color: 220 40% 12%;
+}
+
+.dark {
+  --canvas: #080a0f;
+  --canvas-soft: #0b0e14;
+  --surface: #0e1117;
+  --surface-2: #141920;
+  --surface-3: #1b212b;
+  --line: #1e242e;
+  --line-strong: #2d3644;
+  --fg: #e9edf4;
+  --fg-muted: #9aa5b4;
+  --fg-subtle: #6d7887;
+  --accent: #5aa6ff;
+  --accent-hover: #7bb9ff;
+  --accent-fg: #06121f;
+  --accent-soft: #10233a;
+  --accent-line: #23405f;
+  --grid: rgb(233 237 244 / 0.04);
+  --glow: rgb(90 166 255 / 0.1);
+  --shadow-color: 220 60% 2%;
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-canvas-soft: var(--canvas-soft);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-line: var(--accent-line);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
+
+  --shadow-card: 0 1px 2px hsl(var(--shadow-color) / 0.05),
+    0 8px 24px -12px hsl(var(--shadow-color) / 0.16);
+  --shadow-lift: 0 1px 2px hsl(var(--shadow-color) / 0.06),
+    0 18px 40px -18px hsl(var(--shadow-color) / 0.28);
+
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-toast: toast 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-dialog-in: dialog-in 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes toast {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /*
+   * Native <dialog> needs a reset: the UA stylesheet centres the box, sets its
+   * own max sizes and paints a default white background and backdrop.
+   *
+   * This MUST live inside @layer base. Unlayered rules outrank every Tailwind
+   * utility regardless of specificity, so an unlayered `background: transparent`
+   * here would silently beat the `bg-surface` class on the dialog and leave it
+   * fully transparent — which is exactly what happened before this was moved.
+   */
+  dialog {
+    padding: 0;
+    border: 0;
+    max-width: none;
+    max-height: none;
+    background: transparent;
+    color: inherit;
+  }
+
+  dialog:not([open]) {
+    display: none;
+  }
+
+  /* The tinted background comes from `backdrop:` utilities on the element. */
+  dialog::backdrop {
+    background-color: transparent;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    dialog[open] {
+      animation: backdrop-in 0.2s ease-out;
+    }
+  }
+
+  body {
+    background-color: var(--canvas);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--accent-fg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Long unbroken strings (emails, file paths) must never widen the layout. */
+  code,
+  a {
+    overflow-wrap: anywhere;
+  }
+}
+
+@layer components {
+  /*
+   * Scroll reveal. Elements are visible by default so that content still renders
+   * without JavaScript; `html.js` is set by the inline theme script, and only
+   * then do hidden-until-visible rules apply.
+   */
+  .reveal {
+    opacity: 1;
+  }
+
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.7s var(--ease-out-soft),
+      transform 0.7s var(--ease-out-soft);
+    will-change: opacity, transform;
+  }
+
+  .js .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .grid-backdrop {
+    background-image: linear-gradient(to right, var(--grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size: 64px 64px;
+    background-position: center top;
+    mask-image: radial-gradient(ellipse 80% 55% at 50% 0%, #000 20%, transparent 78%);
+  }
+
+  .accent-glow {
+    background: radial-gradient(
+      ellipse 60% 50% at 50% 0%,
+      var(--glow) 0%,
+      transparent 70%
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
