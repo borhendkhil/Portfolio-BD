@@ -23,16 +23,19 @@ export function Hero({ cvAvailable }: HeroProps) {
 
       <Container>
         <div className="grid items-start gap-12 xl:grid-cols-12 xl:gap-8">
-          <div className="xl:col-span-7">
+          {/* `min-w-0` matters: a grid item defaults to `min-width: auto`, which
+              would let the `pre` below stretch this column past the viewport
+              instead of scrolling its own long lines. */}
+          <div className="min-w-0 xl:col-span-7">
             <Reveal>
-              <p className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-xs text-fg-muted">
+              <p className="inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-full border border-line bg-surface px-3 py-1.5 text-xs text-fg-muted">
                 <span
                   aria-hidden="true"
                   className="size-1.5 rounded-full bg-accent"
                 />
-                {siteConfig.location}
-                <span aria-hidden="true" className="h-3 w-px bg-line-strong" />
                 <span className="font-mono tracking-tight">{siteConfig.role}</span>
+                <span aria-hidden="true" className="hidden h-3 w-px bg-line-strong sm:block" />
+                {siteConfig.location}
               </p>
             </Reveal>
 
@@ -92,7 +95,7 @@ export function Hero({ cvAvailable }: HeroProps) {
                   >
                     <Download aria-hidden="true" className="size-4" />
                     Download CV
-                    <span className="rounded border border-line px-1.5 py-0.5 font-mono text-[0.625rem] tracking-tight uppercase">
+                    <span className="rounded border border-line px-1.5 py-0.5 font-mono text-[0.6875rem] tracking-tight uppercase">
                       PDF pending
                     </span>
                     <span className="sr-only">— not available yet</span>
@@ -108,7 +111,7 @@ export function Hero({ cvAvailable }: HeroProps) {
             </Reveal>
           </div>
 
-          <Reveal delay={200} className="xl:col-span-5">
+          <Reveal delay={200} className="min-w-0 xl:col-span-5">
             <ProfileCard />
           </Reveal>
         </div>
@@ -211,7 +214,7 @@ function ProfileCard() {
           <span className="size-2.5 rounded-full bg-line-strong" />
         </span>
         <span className="ml-2 font-mono text-xs text-fg-subtle">profile.ts</span>
-        <span className="ml-auto inline-flex items-center gap-1.5 font-mono text-[0.6875rem] text-fg-subtle">
+        <span className="ml-auto hidden items-center gap-1.5 font-mono text-xs text-fg-subtle sm:inline-flex">
           <MapPin aria-hidden="true" className="size-3" />
           Tunisia
         </span>
